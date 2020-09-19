@@ -1,6 +1,5 @@
 using Test, Documenter, Parameters, StructMapping
 
-
 @with_kw struct A
     a::Float64
     b::String
@@ -38,9 +37,11 @@ end
     a::Union{A, Nothing} = nothing
 end
 
+dict_d = Dict("a"=>dict_a)
+
 @testset "union" begin
     @test convertdict(D, Dict()) == D()
-    @test convertdict(D, Dict("a"=>dict_a)) == D(A(1.0, "b"))
+    @test convertdict(D, dict_d) == D(A(1.0, "b"))
 end
 
 @dictmap @with_kw struct E
@@ -50,6 +51,17 @@ end
 @testset "union_vector" begin
     @test convertdict(E, Dict()) == E()
     @test convertdict(E, dict_c).a == [A(1.0, "b"), A(2.0, "b2")]
+end
+
+@dictmap @with_kw struct F
+    b::B
+    d::D
+end
+
+@testset "deeply_nested" begin
+    f = convertdict(F, Dict("b"=>dict_b, "d"=>dict_d))
+    @test f.b == B(A(1.0, "b"), 4)
+    @test f.d == D(A(1.0, "b"))
 end
 
 @testset "doctest" begin

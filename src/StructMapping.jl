@@ -4,6 +4,7 @@ using MacroTools: @capture, postwalk
 
 export keytosymbol, convertdict, @dictmap
 
+## Helper functions for `_keytosymbol`
 _keytosymbol(x) = x
 _keytosymbol(v::AbstractVector) = keytosymbol.(v)
 _keytosymbol(d::AbstractDict) = Dict(Symbol(k) => _keytosymbol(v) for (k, v) in pairs(d))
@@ -79,7 +80,7 @@ Macro which allows to use the `convertdict` function for a struct decorated with
 macro dictmap(ex)
     structsymbol = nothing
     postwalk(ex) do x
-        @capture(x, struct T_ fields__ end) || return x
+        @capture(x, struct T_ __ end) || return x
         structsymbol = T
     end
     T = :($__module__.$structsymbol)
