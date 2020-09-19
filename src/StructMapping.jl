@@ -37,10 +37,11 @@ keytosymbol(d::AbstractDict) = _keytosymbol(d)
 _convertdict(T::Type, d::AbstractDict) = T(;d...)
 _convertdict(T::Type, v::AbstractVector) = _convertdict.(T, v)
 function _convertdict(T::Type, d::AbstractDict, m::AbstractDict)
+    dargs = Dict{Symbol, Any}(d)
     for (k, v) in pairs(m)
-        d[k] = _convertdict(v, d[k])
+        dargs[k] = _convertdict(v, d[k])
     end
-    return T(;d...)
+    return T(;dargs...)
 end
 
 """
@@ -53,15 +54,16 @@ _squeeze_type(::Type{T}) where T = T
 _squeeze_type(::Type{Vector{T}}) where T = T
 _squeeze_type(::Type{Union{T, Nothing}}) where T = T
 
-function _findmap(T::Type)
-    mapdict = Dict()
+function _findmap(T::Type, mod::Module)
+    defined_symbols = names(mod; all=true)
+    mapping = Dict()
     for name in fieldnames(T)
         sym = _squeeze_type(fieldtype(T, name))
-        if !isdefined(Base, Symbol(sym))
-            mapdict[name] = sym
+        if Symbol(sym) in defined_symbols
+            mapping[name] = sym
         end
     end
-    return mapdict
+    return mapping
 end
 
 """
@@ -71,15 +73,15 @@ end
 macro dictmap(ex)
     structsymbol = nothing
     postwalk(ex) do x
-        # capture struct
         @capture(x, struct T_ fields__ end) || return x
-        structsymbol = :($T)
+        structsymbol = T
     end
     T = :($__module__.$structsymbol)
     q = quote
         $ex
         function StructMapping._convertdict(::Type{$T}, d::AbstractDict)
-            StructMapping._convertdict($T, keytosymbol(d), StructMapping._findmap($T))
+            mapping = StructMapping._findmap($T, $__module__)
+            StructMapping._convertdict($T, keytosymbol(d), mapping)
         end
     end
     esc(q)
