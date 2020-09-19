@@ -34,6 +34,21 @@ Dict{Symbol,Any} with 2 entries:
 keytosymbol(d::AbstractDict) = _keytosymbol(d)
 
 ## Helper functions for `convertdict`
+_convertdict(T::Type, d::AbstractDict) = T(;d...)
+_convertdict(T::Type, v::AbstractVector) = _convertdict.(T, v)
+function _convertdict(T::Type, d::AbstractDict, m::AbstractDict)
+    for (k, v) in pairs(m)
+        d[k] = _convertdict(v, d[k])
+    end
+    return T(;d...)
+end
+
+"""
+    convertdict(T::Type, d::AbstractDict)
+"""
+convertdict(T::Type, d::AbstractDict) = _convertdict(T, keytosymbol(d))
+
+## Helper function for `@dictmap`
 _squeeze_type(::Type{T}) where T = T
 _squeeze_type(::Type{Vector{T}}) where T = T
 _squeeze_type(::Type{Union{T, Nothing}}) where T = T
@@ -48,20 +63,6 @@ function _findmap(T::Type)
     end
     return mapdict
 end
-
-_convertdict(T::Type, d::AbstractDict) = T(;d...)
-_convertdict(T::Type, v::AbstractVector) = _convertdict.(T, v)
-function _convertdict(T::Type, d::AbstractDict, m::AbstractDict)
-    for (k, v) in pairs(m)
-        d[k] = _convertdict(v, d[k])
-    end
-    return T(;d...)
-end
-
-"""
-    convertdict(T::Type, d::AbstractDict)
-"""
-convertdict(T::Type, d::AbstractDict) = _convertdict(T, keytosymbol(d))
 
 """
     @dictmap
