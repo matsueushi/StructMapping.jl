@@ -34,6 +34,24 @@ dict_c = Dict("a"=>[dict_a, dict_a2])
     @test convertdict(C, dict_c).a == [A(1.0, "b"), A(2.0, "b2")]
 end
 
+@dictmap @with_kw struct D
+    a::Union{A, Nothing} = nothing
+end
+
+@testset "union" begin
+    @test convertdict(D, Dict()) == D()
+    @test convertdict(D, Dict("a"=>dict_a)) == D(A(1.0, "b"))
+end
+
+@dictmap @with_kw struct E
+    a::Union{Vector{A}, Nothing} = nothing
+end
+
+@testset "union_vector" begin
+    @test convertdict(E, Dict()) == E()
+    @test convertdict(E, dict_c).a == [A(1.0, "b"), A(2.0, "b2")]
+end
+
 @testset "doctest" begin
     DocMeta.setdocmeta!(StructMapping, :DocTestSetup, :(using StructMapping); recursive=true)
     doctest(StructMapping)

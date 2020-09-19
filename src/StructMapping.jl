@@ -39,6 +39,7 @@ _convertdict(T::Type, v::AbstractVector) = _convertdict.(T, v)
 function _convertdict(T::Type, d::AbstractDict, m::AbstractDict)
     dargs = Dict{Symbol, Any}(d)
     for (k, v) in pairs(m)
+        haskey(d, k) || continue
         dargs[k] = _convertdict(v, d[k])
     end
     return T(;dargs...)
@@ -46,19 +47,21 @@ end
 
 """
     convertdict(T::Type, d::AbstractDict)
+
+Convert the given dictionary to a object of `T`. `T` must be decorated with `@dictmap`.
 """
 convertdict(T::Type, d::AbstractDict) = _convertdict(T, keytosymbol(d))
 
 ## Helper function for `@dictmap`
-_squeeze_type(::Type{T}) where T = T
-_squeeze_type(::Type{Vector{T}}) where T = T
-_squeeze_type(::Type{Union{T, Nothing}}) where T = T
+_squeezetype(::Type{T}) where T = T
+_squeezetype(::Type{Vector{T}}) where T = T
+_squeezetype(::Type{Union{T, Nothing}}) where T = _squeezetype(T)
 
 function _findmap(T::Type, mod::Module)
     defined_symbols = names(mod; all=true)
     mapping = Dict()
     for name in fieldnames(T)
-        sym = _squeeze_type(fieldtype(T, name))
+        sym = _squeezetype(fieldtype(T, name))
         if Symbol(sym) in defined_symbols
             mapping[name] = sym
         end
@@ -68,6 +71,9 @@ end
 
 """
     @dictmap
+
+Macro which allows to use the `convertdict` function for a struct decorated with
+`@with_kw` or `@with_kw_noshow` of Parameters.jl.
 """
 
 macro dictmap(ex)
