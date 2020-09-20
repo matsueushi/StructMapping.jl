@@ -4,9 +4,7 @@ authors = ["matsueushi <matsueushi@gmail.com>"]
 version = "0.1.0"
 
 [deps]
-DocumenterTools = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
-Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 
 [compat]
 julia = "1"

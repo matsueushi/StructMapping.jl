@@ -1,5 +1,4 @@
 module StructMapping
-using Parameters
 using MacroTools: @capture, postwalk
 
 export convertdict, @dictmap
