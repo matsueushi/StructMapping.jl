@@ -42,5 +42,5 @@ A
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://matsueushi.github.io/StructMapping.jl/dev
 
-[travis-img]: https://travis-ci.org/matsueushi/StructMapping.jl.svg?branch=master
-[travis-url]: https://travis-ci.org/matsueushi/StructMapping.jl
+[travis-img]: https://travis-ci.com/matsueushi/StructMapping.jl.svg?branch=master
+[travis-url]: https://travis-ci.com/matsueushi/StructMapping.jl
