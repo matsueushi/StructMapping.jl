@@ -20,7 +20,7 @@ end
 """
     convertdict(T::Type, d::AbstractDict)
 
-Convert the given dictionary to a object of `T`. `T` must be decorated with `@dictmap`.
+Convert the given dictionary to a object of `T`. `T` must be decorated with `@dictmap` (and `@with_kw` or `@with_kw_noshow` of Parameters.jl).
 """
 convertdict(T::Type, d::AbstractDict) = _convertdict(T, d)
 
