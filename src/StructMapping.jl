@@ -2,47 +2,19 @@ module StructMapping
 using Parameters
 using MacroTools: @capture, postwalk
 
-export keytosymbol, convertdict, @dictmap
-
-## Helper functions for `_keytosymbol`
-_keytosymbol(x) = x
-_keytosymbol(v::AbstractVector) = keytosymbol.(v)
-_keytosymbol(d::AbstractDict) = Dict(Symbol(k) => _keytosymbol(v) for (k, v) in pairs(d))
-
-"""
-    keytosymbol(x)
-
-Convert type of keys of the given dictionary to `Symbol` recursively.
-
-# Examples
-```jldoctest
-julia> keytosymbol(Dict("a"=>1, "b"=>1))
-Dict{Symbol,Int64} with 2 entries:
-  :a => 1
-  :b => 1
-
-julia> keytosymbol(Dict("a"=>1, "b"=>Dict("c"=>2, "d"=>3)))
-Dict{Symbol,Any} with 2 entries:
-  :a => 1
-  :b => Dict(:d=>3,:c=>2)
-
-julia> keytosymbol(Dict("a"=>1, "b"=>[Dict("c"=>2), Dict("d"=>3)]))
-Dict{Symbol,Any} with 2 entries:
-  :a => 1
-  :b => [Dict(:c=>2), Dict(:d=>3)]
-```
-"""
-keytosymbol(d::AbstractDict) = _keytosymbol(d)
+export convertdict, @dictmap
 
 ## Helper functions for `convertdict`
-_convertdict(T::Type, d::AbstractDict) = T(;d...)
+_keytosymbol(d::AbstractDict) = Dict(Symbol(k) => v for (k, v) in pairs(d))
+
+_convertdict(T::Type, d::AbstractDict) = T(;_keytosymbol(d)...)
 _convertdict(T::Type, v::AbstractVector) = _convertdict.(T, v)
-function _convertdict(T::Type, d::AbstractDict, m::AbstractDict)
-    dargs = Dict{Symbol, Any}(d)
-    for (k, v) in pairs(m)
-        haskey(d, k) || continue
-        dargs[k] = _convertdict(v, d[k])
-    end
+
+function _convertdictwithmap(T::Type, d::AbstractDict, m::AbstractDict)
+    dargs = Dict(
+        k=>haskey(m, k) ? _convertdict(m[k], v) : v 
+        for (k, v) in pairs(_keytosymbol(d))
+    )
     return T(;dargs...)
 end
 
@@ -51,7 +23,7 @@ end
 
 Convert the given dictionary to a object of `T`. `T` must be decorated with `@dictmap`.
 """
-convertdict(T::Type, d::AbstractDict) = _convertdict(T, keytosymbol(d))
+convertdict(T::Type, d::AbstractDict) = _convertdict(T, d)
 
 ## Helper function for `@dictmap`
 _squeezetype(::Type{T}) where T = T
@@ -88,7 +60,7 @@ macro dictmap(ex)
         $ex
         function StructMapping._convertdict(::Type{$T}, d::AbstractDict)
             mapping = StructMapping._findmap($T, $__module__)
-            StructMapping._convertdict($T, keytosymbol(d), mapping)
+            StructMapping._convertdictwithmap($T, d, mapping)
         end
     end
     esc(q)

@@ -22,6 +22,12 @@ dict_b = Dict("a"=>dict_a, "b"=>4)
     @test convertdict(B, dict_b) == B(A(1.0, "b"), 4)
 end
 
+dict_b2 = Dict("a"=>dict_a)
+
+@testset "default" begin
+    @test convertdict(B, dict_b2) == B(A(1.0, "b"), 0)
+end
+
 @dictmap @with_kw struct C
     a::Vector{A}
 end
@@ -37,11 +43,9 @@ end
     a::Union{A, Nothing} = nothing
 end
 
-dict_d = Dict("a"=>dict_a)
-
 @testset "union" begin
     @test convertdict(D, Dict()) == D()
-    @test convertdict(D, dict_d) == D(A(1.0, "b"))
+    @test convertdict(D, dict_b2) == D(A(1.0, "b"))
 end
 
 @dictmap @with_kw struct E
@@ -59,9 +63,22 @@ end
 end
 
 @testset "deeply_nested" begin
-    f = convertdict(F, Dict("b"=>dict_b, "d"=>dict_d))
+    f = convertdict(F, Dict("b"=>dict_b, "d"=>dict_b2))
     @test f.b == B(A(1.0, "b"), 4)
     @test f.d == D(A(1.0, "b"))
+end
+
+@dictmap @with_kw struct G
+    a::A
+    g::Dict{String, Int64}
+end
+
+dict_g = Dict("a"=>dict_a, "g"=>Dict("g1"=>0, "g2"=>1))
+
+@testset "dict" begin
+    g = convertdict(G, dict_g)
+    @test g.a == A(1.0, "b")
+    @test g.g == Dict("g1"=>0, "g2"=>1)
 end
 
 @testset "doctest" begin
