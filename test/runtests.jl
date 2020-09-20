@@ -1,6 +1,5 @@
 using Test, Documenter, Parameters, StructMapping
 
-
 @with_kw struct A
     a::Float64
     b::String
@@ -23,6 +22,12 @@ dict_b = Dict("a"=>dict_a, "b"=>4)
     @test convertdict(B, dict_b) == B(A(1.0, "b"), 4)
 end
 
+dict_b2 = Dict("a"=>dict_a)
+
+@testset "default" begin
+    @test convertdict(B, dict_b2) == B(A(1.0, "b"), 0)
+end
+
 @dictmap @with_kw struct C
     a::Vector{A}
 end
@@ -40,7 +45,7 @@ end
 
 @testset "union" begin
     @test convertdict(D, Dict()) == D()
-    @test convertdict(D, Dict("a"=>dict_a)) == D(A(1.0, "b"))
+    @test convertdict(D, dict_b2) == D(A(1.0, "b"))
 end
 
 @dictmap @with_kw struct E
@@ -50,6 +55,30 @@ end
 @testset "union_vector" begin
     @test convertdict(E, Dict()) == E()
     @test convertdict(E, dict_c).a == [A(1.0, "b"), A(2.0, "b2")]
+end
+
+@dictmap @with_kw struct F
+    b::B
+    d::D
+end
+
+@testset "deeply_nested" begin
+    f = convertdict(F, Dict("b"=>dict_b, "d"=>dict_b2))
+    @test f.b == B(A(1.0, "b"), 4)
+    @test f.d == D(A(1.0, "b"))
+end
+
+@dictmap @with_kw struct G
+    a::A
+    g::Dict{String, Int64}
+end
+
+dict_g = Dict("a"=>dict_a, "g"=>Dict("g1"=>0, "g2"=>1))
+
+@testset "dict" begin
+    g = convertdict(G, dict_g)
+    @test g.a == A(1.0, "b")
+    @test g.g == Dict("g1"=>0, "g2"=>1)
 end
 
 @testset "doctest" begin
