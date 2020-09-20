@@ -51,7 +51,7 @@ B
   b: Int64 2
 ```
 
-## Vector, default values
+## Vector and default values
 ```julia
 julia> @dictmap @with_kw struct C
            a::Vector{A}
