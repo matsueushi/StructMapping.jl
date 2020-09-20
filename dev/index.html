@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · StructMapping.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">StructMapping.jl</span></div><form class="docs-search" action="search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Home</a><ul class="internal"><li><a class="tocitem" href="#Working-with-JSON"><span>Working with JSON</span></a></li><li><a class="tocitem" href="#Vector-and-default-values"><span>Vector and default values</span></a></li><li><a class="tocitem" href="#Deeply-nested-dictionary"><span>Deeply nested dictionary</span></a></li><li><a class="tocitem" href="#Related-packages"><span>Related packages</span></a></li></ul></li><li><a class="tocitem" href="functions/">Functions</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Home</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Home</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/matsueushi/StructMapping.jl/blob/master/docs/src/index.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="StructMapping.jl"><a class="docs-heading-anchor" href="#StructMapping.jl">StructMapping.jl</a><a id="StructMapping.jl-1"></a><a class="docs-heading-anchor-permalink" href="#StructMapping.jl" title="Permalink"></a></h1><p>This package allows to map a nested <code>Dict</code> to struct.</p><pre><code class="language-julia">julia&gt; using Parameters, StructMapping
+
+julia&gt; @with_kw struct A
+           a::Float64
+           b::String
+       end
+
+julia&gt; @dictmap @with_kw struct B
+           a::A
+           b::Int64
+       end
+
+julia&gt; j = Dict(&quot;a&quot;=&gt;Dict(&quot;a&quot;=&gt;1.0, &quot;b&quot;=&gt;&quot;hello&quot;), &quot;b&quot;=&gt;2)
+Dict{String,Any} with 2 entries:
+  &quot;b&quot; =&gt; 2
+  &quot;a&quot; =&gt; Dict{String,Any}(&quot;b&quot;=&gt;&quot;hello&quot;,&quot;a&quot;=&gt;1.0)
+
+julia&gt; b = convertdict(B, j)
+B
+  a: A
+  b: Int64 2
+
+julia&gt; b.a
+A
+  a: Float64 1.0
+  b: String &quot;hello&quot;</code></pre><h2 id="Working-with-JSON"><a class="docs-heading-anchor" href="#Working-with-JSON">Working with JSON</a><a id="Working-with-JSON-1"></a><a class="docs-heading-anchor-permalink" href="#Working-with-JSON" title="Permalink"></a></h2><pre><code class="language-julia">julia&gt; using JSON
+
+julia&gt; s = &quot;{\&quot;b\&quot;:2,\&quot;a\&quot;:{\&quot;b\&quot;:\&quot;hello\&quot;,\&quot;a\&quot;:1.0}}&quot;
+&quot;{\&quot;b\&quot;:2,\&quot;a\&quot;:{\&quot;b\&quot;:\&quot;hello\&quot;,\&quot;a\&quot;:1.0}}&quot;
+
+julia&gt; println(s)
+{&quot;b&quot;:2,&quot;a&quot;:{&quot;b&quot;:&quot;hello&quot;,&quot;a&quot;:1.0}}
+
+julia&gt; j = JSON.parse(s)
+Dict{String,Any} with 2 entries:
+  &quot;b&quot; =&gt; 2
+  &quot;a&quot; =&gt; Dict{String,Any}(&quot;b&quot;=&gt;&quot;hello&quot;,&quot;a&quot;=&gt;1.0)
+
+julia&gt; convertdict(B, j)
+B
+  a: A
+  b: Int64 2</code></pre><h2 id="Vector-and-default-values"><a class="docs-heading-anchor" href="#Vector-and-default-values">Vector and default values</a><a id="Vector-and-default-values-1"></a><a class="docs-heading-anchor-permalink" href="#Vector-and-default-values" title="Permalink"></a></h2><pre><code class="language-julia">julia&gt; @dictmap @with_kw struct C
+           a::Vector{A}
+           b::Union{A, Nothing} = nothing
+           c::Int64 = 5
+       end
+
+julia&gt; j2 = Dict(&quot;a&quot;=&gt;[Dict(&quot;a&quot;=&gt;1.0, &quot;b&quot;=&gt;&quot;hello&quot;), Dict(&quot;a&quot;=&gt;2.0, &quot;b&quot;=&gt;&quot;world&quot;)])
+Dict{String,Array{Dict{String,Any},1}} with 1 entry:
+  &quot;a&quot; =&gt; Dict{String,Any}[Dict(&quot;b&quot;=&gt;&quot;hello&quot;,&quot;a&quot;=&gt;1.0), Dict(&quot;b&quot;=&gt;&quot;world&quot;,&quot;a&quot;=&gt;2.0)]
+
+julia&gt; c = convertdict(C, j2)
+C
+  a: Array{A}((2,))
+  b: Nothing nothing
+  c: Int64 5
+
+julia&gt; c.a
+2-element Array{A,1}:
+ A(1.0, &quot;hello&quot;)
+ A(2.0, &quot;world&quot;)
+
+julia&gt; j3 = Dict(&quot;a&quot;=&gt;[Dict(&quot;a&quot;=&gt;1.0, &quot;b&quot;=&gt;&quot;hello&quot;)], &quot;b&quot;=&gt;Dict(&quot;b&quot;=&gt;&quot;world&quot;,&quot;a&quot;=&gt;2.0))
+Dict{String,Any} with 2 entries:
+  &quot;b&quot; =&gt; Dict{String,Any}(&quot;b&quot;=&gt;&quot;world&quot;,&quot;a&quot;=&gt;2.0)
+  &quot;a&quot; =&gt; Dict{String,Any}[Dict(&quot;b&quot;=&gt;&quot;hello&quot;,&quot;a&quot;=&gt;1.0)]
+
+julia&gt; c2 = convertdict(C, j3)
+C
+  a: Array{A}((1,))
+  b: A
+  c: Int64 5
+
+julia&gt; c2.a
+1-element Array{A,1}:
+ A(1.0, &quot;hello&quot;)
+
+julia&gt; c2.b
+A
+  a: Float64 2.0
+  b: String &quot;world&quot;</code></pre><h2 id="Deeply-nested-dictionary"><a class="docs-heading-anchor" href="#Deeply-nested-dictionary">Deeply nested dictionary</a><a id="Deeply-nested-dictionary-1"></a><a class="docs-heading-anchor-permalink" href="#Deeply-nested-dictionary" title="Permalink"></a></h2><pre><code class="language-julia">julia&gt; @dictmap @with_kw struct D
+           b::B
+           s::String
+       end
+
+julia&gt; j5 = Dict(&quot;s&quot;=&gt;&quot;hi&quot;, &quot;b&quot;=&gt;Dict(&quot;a&quot;=&gt;Dict(&quot;a&quot;=&gt;1.0, &quot;b&quot;=&gt;&quot;hello&quot;), &quot;b&quot;=&gt;2))
+Dict{String,Any} with 2 entries:
+  &quot;b&quot; =&gt; Dict{String,Any}(&quot;b&quot;=&gt;2,&quot;a&quot;=&gt;Dict{String,Any}(&quot;b&quot;=&gt;&quot;hello&quot;,&quot;a&quot;=&gt;1.0))
+  &quot;s&quot; =&gt; &quot;hi&quot;
+
+julia&gt; d = convertdict(D, j5)
+D
+  b: B
+  s: String &quot;hi&quot;
+
+julia&gt; d.b
+B
+  a: A
+  b: Int64 2
+
+julia&gt; d.b.a
+A
+  a: Float64 1.0
+  b: String &quot;hello&quot;</code></pre><h2 id="Related-packages"><a class="docs-heading-anchor" href="#Related-packages">Related packages</a><a id="Related-packages-1"></a><a class="docs-heading-anchor-permalink" href="#Related-packages" title="Permalink"></a></h2><ul><li><a href="https://github.com/mauro3/Parameters.jl">mauro3/Parameters.jl</a></li><li><a href="https://github.com/JuliaIO/JSON.jl">JuliaIO/JSON.jl</a></li></ul></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="functions/">Functions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 20 September 2020 12:04">Sunday 20 September 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
