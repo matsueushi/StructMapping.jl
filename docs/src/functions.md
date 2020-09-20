@@ -2,5 +2,5 @@
 
 ```@docs
 convertdict
-@dictmap
+dictmap
 ```
