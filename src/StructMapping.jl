@@ -47,7 +47,6 @@ end
 Macro which allows to use the `convertdict` function for a struct decorated with
 `@with_kw` or `@with_kw_noshow` of Parameters.jl.
 """
-
 macro dictmap(ex)
     structsymbol = nothing
     postwalk(ex) do x
