@@ -42,7 +42,7 @@ function _findmap(T::Type, mod::Module)
 end
 
 """
-    @dictmap
+    @dictmap(ex)
 
 Macro which allows to use the `convertdict` function for a struct decorated with
 `@with_kw` or `@with_kw_noshow` of Parameters.jl.

@@ -1,6 +1,5 @@
 ## Functions
 
-```@docs
-convertdict
-dictmap
+```@autodocs
+Modules = [StructMapping]
 ```
