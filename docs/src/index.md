@@ -1,6 +1,7 @@
 # StructMapping.jl
 
-This package allows to map a nested `Dict` to struct.
+This package allows to map a nested `Dict` to struct. 
+Structs should be decorated with [`@with_kw`](https://mauro3.github.io/Parameters.jl/stable/api/#Parameters.@with_kw-Tuple{Any}) or [`@with_kw_noshow`](https://mauro3.github.io/Parameters.jl/stable/api/#Parameters.@with_kw_noshow-Tuple{Any}) of [Paramters.jl](https://github.com/mauro3/Parameters.jl) and `@dictmap`.
 ```julia
 julia> using Parameters, StructMapping
 
