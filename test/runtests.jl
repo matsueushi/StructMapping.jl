@@ -11,6 +11,19 @@ dict_a = Dict("a"=>1.0, "b"=>"b")
     @test convertdict(A, dict_a) == A(1.0, "b")
 end
 
+@with_kw struct A2
+    a::Float64
+    b::Vector{String}
+end
+
+dict_a2 = Dict("a"=>1.0, "b"=>["b"])
+
+@testset "basic2" begin
+    a2 = convertdict(A2, dict_a2)
+    @test a2.a == 1.0
+    @test a2.b == ["b"]
+end
+
 @dictmap @with_kw struct B
     a::A
     b::Int64 = 0
