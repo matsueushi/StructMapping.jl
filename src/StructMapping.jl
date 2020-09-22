@@ -3,15 +3,21 @@ using MacroTools: @capture, postwalk
 
 export convertdict, @dictmap
 
-## Helper functions for `convertdict`
+## Helper functions
 _keytosymbol(d::AbstractDict) = Dict(Symbol(k) => v for (k, v) in pairs(d))
 
+_squeezetype(::Type{T}) where T = T
+_squeezetype(::Type{T}) where T <: AbstractVector = eltype(T)
+_squeezetype(::Type{Union{T, Nothing}}) where T = _squeezetype(T)
+
+_convertdict(::Type, x) = x
 _convertdict(T::Type, d::AbstractDict) = T(;_keytosymbol(d)...)
+_convertdict(::Type{T}, d::AbstractDict) where T <: AbstractDict = d
 _convertdict(T::Type, v::AbstractVector) = _convertdict.(T, v)
 
-function _convertdictwithmap(T::Type, d::AbstractDict, m::AbstractDict)
+function _convertdictwithmap(T::Type, d::AbstractDict)
     dargs = Dict(
-        k=>haskey(m, k) ? _convertdict(m[k], v) : v 
+        k => _convertdict(_squeezetype(fieldtype(T, k)), v)
         for (k, v) in pairs(_keytosymbol(d))
     )
     return T(;dargs...)
@@ -20,26 +26,10 @@ end
 """
     convertdict(T::Type, d::AbstractDict)
 
-Convert the given dictionary to a object of `T`. `T` must be decorated with `@dictmap` (and `@with_kw` or `@with_kw_noshow` of Parameters.jl).
+Convert the given dictionary to a object of `T`.
+`T` must be decorated with `@dictmap` (and `@with_kw` or `@with_kw_noshow` of Parameters.jl).
 """
 convertdict(T::Type, d::AbstractDict) = _convertdict(T, d)
-
-## Helper function for `@dictmap`
-_squeezetype(::Type{T}) where T = T
-_squeezetype(::Type{Vector{T}}) where T = T
-_squeezetype(::Type{Union{T, Nothing}}) where T = _squeezetype(T)
-
-function _findmap(T::Type, mod::Module)
-    defined_symbols = names(mod; all=true)
-    mapping = Dict()
-    for name in fieldnames(T)
-        sym = _squeezetype(fieldtype(T, name))
-        if Symbol(sym) in defined_symbols
-            mapping[name] = sym
-        end
-    end
-    return mapping
-end
 
 """
     @dictmap(ex)
@@ -56,10 +46,7 @@ macro dictmap(ex)
     T = :($__module__.$structsymbol)
     q = quote
         $ex
-        function StructMapping._convertdict(::Type{$T}, d::AbstractDict)
-            mapping = StructMapping._findmap($T, $__module__)
-            StructMapping._convertdictwithmap($T, d, mapping)
-        end
+        StructMapping._convertdict(::Type{$T}, d::AbstractDict) = StructMapping._convertdictwithmap($T, d)
     end
     esc(q)
 end
