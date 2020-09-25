@@ -24,7 +24,7 @@ dict_a2 = Dict("a"=>1.0, "b"=>["b"])
     @test a2.b == ["b"]
 end
 
-@dictmap @with_kw struct B
+@with_kw struct B
     a::A
     b::Int64 = 0
 end
@@ -41,7 +41,7 @@ dict_b2 = Dict("a"=>dict_a)
     @test convertdict(B, dict_b2) == B(A(1.0, "b"), 0)
 end
 
-@dictmap @with_kw struct C
+@with_kw struct C
     a::Vector{A}
 end
 
@@ -52,7 +52,7 @@ dict_c = Dict("a"=>[dict_a, dict_a2])
     @test convertdict(C, dict_c).a == [A(1.0, "b"), A(2.0, "b2")]
 end
 
-@dictmap @with_kw struct D
+@with_kw struct D
     a::Union{A, Nothing} = nothing
 end
 
@@ -61,7 +61,7 @@ end
     @test convertdict(D, dict_b2) == D(A(1.0, "b"))
 end
 
-@dictmap @with_kw struct E
+@with_kw struct E
     a::Union{Vector{A}, Nothing} = nothing
 end
 
@@ -70,7 +70,7 @@ end
     @test convertdict(E, dict_c).a == [A(1.0, "b"), A(2.0, "b2")]
 end
 
-@dictmap @with_kw struct F
+@with_kw struct F
     b::B
     d::D
 end
@@ -81,7 +81,7 @@ end
     @test f.d == D(A(1.0, "b"))
 end
 
-@dictmap @with_kw struct G
+@with_kw struct G
     a::A
     g::Dict{String, Int64}
 end
