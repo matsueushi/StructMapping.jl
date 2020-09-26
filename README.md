@@ -11,7 +11,7 @@ julia> @with_kw struct A
            b::String
        end
 
-julia> @dictmap @with_kw struct B
+julia> @with_kw struct B
            a::A
            b::Int64
        end

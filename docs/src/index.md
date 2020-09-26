@@ -10,7 +10,7 @@ julia> @with_kw struct A
            b::String
        end
 
-julia> @dictmap @with_kw struct B
+julia> @with_kw struct B
            a::A
            b::Int64
        end
@@ -54,7 +54,7 @@ B
 
 ## Vector and default values
 ```julia
-julia> @dictmap @with_kw struct C
+julia> @with_kw struct C
            a::Vector{A}
            b::Union{A, Nothing} = nothing
            c::Int64 = 5
@@ -98,7 +98,7 @@ A
 
 ## Deeply nested dictionary
 ```julia
-julia> @dictmap @with_kw struct D
+julia> @with_kw struct D
            b::B
            s::String
        end
