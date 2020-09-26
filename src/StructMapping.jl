@@ -1,5 +1,4 @@
 module StructMapping
-using MacroTools: @capture, postwalk
 
 export convertdict
 
