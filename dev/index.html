@@ -6,7 +6,7 @@ julia&gt; @with_kw struct A
            b::String
        end
 
-julia&gt; @dictmap @with_kw struct B
+julia&gt; @with_kw struct B
            a::A
            b::Int64
        end
@@ -40,7 +40,7 @@ Dict{String,Any} with 2 entries:
 julia&gt; convertdict(B, j)
 B
   a: A
-  b: Int64 2</code></pre><h2 id="Vector-and-default-values"><a class="docs-heading-anchor" href="#Vector-and-default-values">Vector and default values</a><a id="Vector-and-default-values-1"></a><a class="docs-heading-anchor-permalink" href="#Vector-and-default-values" title="Permalink"></a></h2><pre><code class="language-julia">julia&gt; @dictmap @with_kw struct C
+  b: Int64 2</code></pre><h2 id="Vector-and-default-values"><a class="docs-heading-anchor" href="#Vector-and-default-values">Vector and default values</a><a id="Vector-and-default-values-1"></a><a class="docs-heading-anchor-permalink" href="#Vector-and-default-values" title="Permalink"></a></h2><pre><code class="language-julia">julia&gt; @with_kw struct C
            a::Vector{A}
            b::Union{A, Nothing} = nothing
            c::Int64 = 5
@@ -79,7 +79,7 @@ julia&gt; c2.a
 julia&gt; c2.b
 A
   a: Float64 2.0
-  b: String &quot;world&quot;</code></pre><h2 id="Deeply-nested-dictionary"><a class="docs-heading-anchor" href="#Deeply-nested-dictionary">Deeply nested dictionary</a><a id="Deeply-nested-dictionary-1"></a><a class="docs-heading-anchor-permalink" href="#Deeply-nested-dictionary" title="Permalink"></a></h2><pre><code class="language-julia">julia&gt; @dictmap @with_kw struct D
+  b: String &quot;world&quot;</code></pre><h2 id="Deeply-nested-dictionary"><a class="docs-heading-anchor" href="#Deeply-nested-dictionary">Deeply nested dictionary</a><a id="Deeply-nested-dictionary-1"></a><a class="docs-heading-anchor-permalink" href="#Deeply-nested-dictionary" title="Permalink"></a></h2><pre><code class="language-julia">julia&gt; @with_kw struct D
            b::B
            s::String
        end
@@ -102,4 +102,4 @@ B
 julia&gt; d.b.a
 A
   a: Float64 1.0
-  b: String &quot;hello&quot;</code></pre><h2 id="Related-packages"><a class="docs-heading-anchor" href="#Related-packages">Related packages</a><a id="Related-packages-1"></a><a class="docs-heading-anchor-permalink" href="#Related-packages" title="Permalink"></a></h2><ul><li><a href="https://github.com/mauro3/Parameters.jl">mauro3/Parameters.jl</a></li><li><a href="https://github.com/JuliaIO/JSON.jl">JuliaIO/JSON.jl</a></li></ul></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="functions/">Functions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 22 September 2020 09:35">Tuesday 22 September 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+  b: String &quot;hello&quot;</code></pre><h2 id="Related-packages"><a class="docs-heading-anchor" href="#Related-packages">Related packages</a><a id="Related-packages-1"></a><a class="docs-heading-anchor-permalink" href="#Related-packages" title="Permalink"></a></h2><ul><li><a href="https://github.com/mauro3/Parameters.jl">mauro3/Parameters.jl</a></li><li><a href="https://github.com/JuliaIO/JSON.jl">JuliaIO/JSON.jl</a></li></ul></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="functions/">Functions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 26 September 2020 00:40">Saturday 26 September 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
