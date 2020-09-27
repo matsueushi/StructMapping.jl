@@ -3,8 +3,6 @@ module StructMapping
 export convertdict
 
 ## Helper functions
-_keytosymbol(d::AbstractDict) = Dict(Symbol(k) => v for (k, v) in pairs(d))
-
 _convertdict(::Type, x) = x
 _convertdict(::Type{Union{T, Nothing}}, x) where T = _convertdict(T, x)
 _convertdict(::Type{Union{T, Nothing}}, d::AbstractDict) where T = _convertdict(T, d)
@@ -12,11 +10,12 @@ _convertdict(::Type{T}, v::AbstractVector) where T <: AbstractVector = _convertd
 _convertdict(::Type{T}, d::AbstractDict) where T <: AbstractDict = d
 
 function _convertdict(T::Type, d::AbstractDict)
-    dargs = Dict(
-        k => _convertdict(fieldtype(T, k), v)
-        for (k, v) in pairs(_keytosymbol(d))
-    )
-    return T(;dargs...)
+    kwargs = Dict{Symbol, Any}()
+    for (k, v) in pairs(d)
+        symk = Symbol(k)
+        kwargs[symk] = _convertdict(fieldtype(T, symk), v)
+    end
+    return T(;kwargs...)
 end
 
 """
