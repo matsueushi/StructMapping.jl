@@ -5,17 +5,15 @@ export convertdict
 ## Helper functions
 _keytosymbol(d::AbstractDict) = Dict(Symbol(k) => v for (k, v) in pairs(d))
 
-_squeezetype(::Type{T}) where T = T
-_squeezetype(::Type{T}) where T <: AbstractVector = eltype(T)
-_squeezetype(::Type{Union{T, Nothing}}) where T = _squeezetype(T)
-
 _convertdict(::Type, x) = x
+_convertdict(::Type{Union{T, Nothing}}, x) where T = _convertdict(T, x)
+_convertdict(::Type{Union{T, Nothing}}, d::AbstractDict) where T = _convertdict(T, d)
+_convertdict(::Type{T}, v::AbstractVector) where T <: AbstractVector = _convertdict.(eltype(T), v)
 _convertdict(::Type{T}, d::AbstractDict) where T <: AbstractDict = d
-_convertdict(T::Type, v::AbstractVector) = _convertdict.(T, v)
 
 function _convertdict(T::Type, d::AbstractDict)
     dargs = Dict(
-        k => _convertdict(_squeezetype(fieldtype(T, k)), v)
+        k => _convertdict(fieldtype(T, k), v)
         for (k, v) in pairs(_keytosymbol(d))
     )
     return T(;dargs...)
