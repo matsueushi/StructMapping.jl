@@ -3,19 +3,21 @@ module StructMapping
 export convertdict
 
 ## Helper functions
-_convertdict(::Type, x) = x
-_convertdict(::Type{Union{T, Nothing}}, x) where T = _convertdict(T, x)
-_convertdict(::Type{Union{T, Nothing}}, d::AbstractDict) where T = _convertdict(T, d)
-_convertdict(::Type{T}, v::AbstractVector) where T <: AbstractVector = _convertdict.(eltype(T), v)
-_convertdict(::Type{T}, d::AbstractDict) where T <: AbstractDict = d
+_convertdict(::Type{T}, x) where {T} = T(x)
+_convertdict(::Type{Union{T,Nothing}}, x) where {T} = _convertdict(T, x)
+_convertdict(::Type{Union{T,Nothing}}, d::AbstractDict) where {T} = _convertdict(T, d)
+function _convertdict(::Type{T}, v::AbstractVector) where {T<:AbstractVector}
+    return T(_convertdict.(eltype(T), v))
+end
+_convertdict(::Type{T}, d::AbstractDict) where {T<:AbstractDict} = d
 
 function _convertdict(T::Type, d::AbstractDict)
-    kwargs = Dict{Symbol, Any}()
+    kwargs = Dict{Symbol,Any}()
     for (k, v) in pairs(d)
         symk = Symbol(k)
         kwargs[symk] = _convertdict(fieldtype(T, symk), v)
     end
-    return T(;kwargs...)
+    return T(; kwargs...)
 end
 
 """
