@@ -1,7 +1,7 @@
 name = "StructMapping"
 uuid = "7c3b921d-20d6-4eba-ad57-605525e86ab2"
 authors = ["matsueushi <matsueushi@gmail.com>"]
-version = "0.2.1"
+version = "0.2.2"
 
 [compat]
 julia = "1.2"
