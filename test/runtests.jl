@@ -36,7 +36,6 @@ dict_b = Dict("a" => dict_a, "b" => 4)
 end
 
 dict_b2 = Dict("a" => dict_a)
-dict_b3 = Dict("a" =>  nothing)
 
 @testset "default" begin
     @test convertdict(B, dict_b2) == B(A(1.0, "b"), 0)
