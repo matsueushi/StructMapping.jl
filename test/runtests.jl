@@ -36,6 +36,7 @@ dict_b = Dict("a" => dict_a, "b" => 4)
 end
 
 dict_b2 = Dict("a" => dict_a)
+dict_b3 = Dict("a" =>  nothing)
 
 @testset "default" begin
     @test convertdict(B, dict_b2) == B(A(1.0, "b"), 0)
@@ -59,6 +60,7 @@ end
 @testset "union" begin
     @test convertdict(D, Dict()) == D()
     @test convertdict(D, dict_b2) == D(A(1.0, "b"))
+    @test convertdict(D, Dict("a" => nothing)) == D()
 end
 
 @with_kw struct E
@@ -68,6 +70,7 @@ end
 @testset "union_vector" begin
     @test convertdict(E, Dict()) == E()
     @test convertdict(E, dict_c).a == [A(1.0, "b"), A(2.0, "b2")]
+    @test convertdict(E, Dict("a" => nothing)) == E()
 end
 
 @with_kw struct F
