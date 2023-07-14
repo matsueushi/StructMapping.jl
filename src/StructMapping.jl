@@ -6,6 +6,7 @@ export convertdict
 _convertdict(::Type{T}, x) where {T} = T(x)
 _convertdict(::Type{Union{T,Nothing}}, x) where {T} = _convertdict(T, x)
 _convertdict(::Type{Union{T,Nothing}}, d::AbstractDict) where {T} = _convertdict(T, d)
+_convertdict(::Type{Union{T,Nothing}}, ::Nothing) where {T} = nothing
 function _convertdict(::Type{T}, v::AbstractVector) where {T<:AbstractVector}
     return T(_convertdict.(eltype(T), v))
 end
